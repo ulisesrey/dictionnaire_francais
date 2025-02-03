@@ -33,8 +33,9 @@ if st.button("Search Definition"):
                     
                     if examples:
                         example_text = "<br><span style='color:blue; font-style:italic;'>Example(s):</span><br>"
-                        for example in examples:
-                            example_text += f"<span style='color:blue; font-style:italic;'>- {example.text.strip()}</span><br>"
+                        for i, example in enumerate(examples):
+                            i=i+1
+                            example_text += f"<span style='color:blue; font-style:italic;'>{i}. {example.text.strip()}</span>  "
                     
                     # Now we can remove them from definition
                     for example in definition.find_all("span", class_="ExempleDefinition"):

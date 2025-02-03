@@ -26,11 +26,24 @@ if st.button("Search Definition"):
                 for definition in definitions:
                     # Extract the definition number and text
                     num_def = definition.find("span", class_="numDef").text.strip()
-                    definition_text = definition.get_text(" ", strip=True).replace(num_def, '').strip()
 
-                    # Extract example text if available
-                    example = definition.find("span", class_="ExempleDefinition")
-                    example_text = f"<br><span style='color:blue; font-style:italic;'>Example: {example.text.strip()}</span>" if example else ""
+                    # Extract all examples if available
+                    examples = definition.find_all("span", class_="ExempleDefinition")
+                    example_text = ""
+                    
+                    if examples:
+                        example_text = "<br><span style='color:blue; font-style:italic;'>Example(s):</span><br>"
+                        for example in examples:
+                            example_text += f"<span style='color:blue; font-style:italic;'>- {example.text.strip()}</span><br>"
+                    
+                    # Now we can remove them from definition
+                    for example in definition.find_all("span", class_="ExempleDefinition"):
+                        example.extract()
+                    definition_text = definition.get_text(" ", strip=True).replace(num_def, '').strip()
+                    # if there is a ":" at the end, remove it
+                    if definition_text[-1] == ":":
+                        definition_text = definition_text[:-1]
+                    
 
                     # Extract synonyms if available
                     synonyms = definition.find_all("span", class_="Renvois")
@@ -39,9 +52,9 @@ if st.button("Search Definition"):
                         synonym_links = [synonym.find("a").text.strip() for synonym in synonyms]
                         synonym_text = f"<br><strong>Synonyms: </strong>{' - '.join(synonym_links)}"
 
-                    # Format the complete definition with the number and example
+                    # Format the complete definition with the number, examples, and synonyms
                     formatted_definitions.append(
-                        f"<span style='font-weight: bold; font-size: 16px;'>{num_def}. {definition_text}</span>{example_text}{synonym_text}"
+                        f"<span style='font-weight: bold; font-size: 16px;'>{num_def}</span> {definition_text}{example_text}{synonym_text}"
                     )
 
                 # Join all formatted definitions with line breaks

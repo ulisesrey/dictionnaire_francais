@@ -4,9 +4,11 @@ from bs4 import BeautifulSoup
 
 st.title("French Dictionary")
 
+st.query_params(page="mypage")
+
 # get query params from URL
 query_params = st.query_params
-word = query_params.get("word", "")
+#word = query_params.get("word", "")
 
 # User input for URL
 word = st.text_input("Enter your word", value=word)

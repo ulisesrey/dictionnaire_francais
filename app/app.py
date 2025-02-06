@@ -4,8 +4,12 @@ from bs4 import BeautifulSoup
 
 st.title("French Dictionary")
 
+# get query params from URL
+query_params = st.query_params
+word = query_params.get("word", "")
+
 # User input for URL
-word = st.text_input("Enter your word")
+word = st.text_input("Enter your word", value=word)
 
 if st.button("Search Definition"):
     if word:
@@ -15,11 +19,22 @@ if st.button("Search Definition"):
             page = requests.get(url, timeout=10)
             soup = BeautifulSoup(page.content, 'html.parser')
 
+            # Get Catgram
+            catgram = soup.find("p", class_="CatgramDefinition")
+            if catgram:
+                # Remove <a> tags inside the CatgramDefinition
+                for a in catgram.find_all("a"):
+                    a.extract()
+
+                catgram_text = catgram.get_text(strip=True)
+            else:
+                catgram_text = "Unknown"
+
             # Extract all definitions
             definitions = soup.select(".Definitions .DivisionDefinition")
 
             if definitions:
-                st.subheader("Definitions:")
+                st.subheader(f"{word} ({catgram_text})")
 
                 formatted_definitions = []
 
@@ -29,13 +44,13 @@ if st.button("Search Definition"):
 
                     # Extract all examples if available
                     examples = definition.find_all("span", class_="ExempleDefinition")
-                    example_text = ""
+                    example_text = "<br>"
                     
                     if examples:
-                        example_text = "<br><span style='color:blue; font-style:italic;'>Example(s):</span><br>"
+                        #example_text = "<br><span style='color:blue; font-style:italic;'>Example(s):</span><br>"
                         for i, example in enumerate(examples):
                             i=i+1
-                            example_text += f"<span style='color:blue; font-style:italic;'>{i}. {example.text.strip()}</span>  "
+                            example_text += f"<span style='color:blue; font-style:italic;'>- {example.text.strip()}</span>  "
                     
                     # Now we can remove them from definition
                     for example in definition.find_all("span", class_="ExempleDefinition"):

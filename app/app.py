@@ -17,7 +17,7 @@ word = st.text_input("Mot à chercher", value=word, placeholder="Ecrivez votre m
 #if st.button("Search Definition"):
 if word:
     try:
-        headers = {"User-Agent": "Mozilla/5.0"}
+        headers = {"User-Agent": "Mozilla/5.0"} # TODO: Add random headers to avoid getting blocked
         url = "https://www.larousse.fr/dictionnaires/francais/"+word
         page = requests.get(url, timeout=10)
         soup = BeautifulSoup(page.content, 'html.parser')

@@ -1,3 +1,4 @@
+"""Responsible for fetching and parsing definitions from the website."""
 import requests
 from bs4 import BeautifulSoup
 

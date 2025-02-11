@@ -1,3 +1,6 @@
+"""
+Streamlit app that displays the definitions to the user
+"""
 import streamlit as st
 from scraper import fetch_page_content, get_catgram, get_definitions
 

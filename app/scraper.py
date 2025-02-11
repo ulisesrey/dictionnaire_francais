@@ -24,12 +24,42 @@ def get_catgram(soup):
         return catgram.get_text(strip=True)
     return "Unknown"
 
-def get_synonyms(definition):
-    """Extracts synonyms from a definition block."""
-    synonyms = definition.find_all("span", class_="Renvois")
-    if synonyms:
-        return [synonym.find("a").text.strip() for synonym in synonyms]
-    return []
+def get_related_words(definition):
+    """Extracts synonyms and antonyms from a definition block."""
+    synonyms, antonyms = [], []
+    
+    for libelle in definition.find_all("p", class_="LibelleSynonyme"):
+        related_type = libelle.get_text(strip=True).lower()  # "synonymes :" or "contraires :"
+        related_block = libelle.find_next_sibling("p", class_="Synonymes")
+
+        if related_block:
+            words = []
+            # Extract words inside <a> and outside <a>
+            for elem in related_block.find_all(["a", "span"], recursive=True):
+                words.append(elem.get_text(strip=True))
+            
+            full_text = related_block.get_text(separator=" ", strip=True)  # Get full line of synonyms/antonyms
+            all_words = full_text.split(" - ")  # Split by " - " to separate words correctly
+            
+            if "synonyme" in related_type:
+                synonyms.extend(all_words)
+            elif "contraire" in related_type:
+                antonyms.extend(all_words)
+
+    return synonyms, antonyms
+
+def get_clean_definition_text(definition):
+    """Extracts only the definition text, ignoring examples, synonyms, and antonyms."""
+    
+    num_def = definition.find("span", class_="numDef")
+    if num_def:
+        num_def.extract()  # Remove the number tag
+
+    # The first text node after removing numDef is the real definition
+    definition_text = definition.get_text(" ", strip=True).split(":")[0]  # Stop at ":" to avoid examples
+    
+    return definition_text
+
 
 def get_definitions(soup):
     """Extracts and formats definitions from the page."""
@@ -46,18 +76,17 @@ def get_definitions(soup):
             example.extract()
 
         # Extract and clean definition text
-        definition_text = definition.get_text(" ", strip=True).replace(num_def, "").strip()
-        if definition_text.endswith(":"):
-            definition_text = definition_text[:-1]
+        definition_text = get_clean_definition_text(definition)
         
-        # Extract synonyms
-        synonyms = get_synonyms(definition)
+        # Extract synonyms and antonyms
+        synonyms, antonyms = get_related_words(definition)
 
         formatted_definitions.append({
             "number": num_def,
             "text": definition_text,
             "examples": example_text,
-            "synonyms": synonyms
+            "synonyms": synonyms,
+            "antonyms": antonyms
         })
 
     return formatted_definitions

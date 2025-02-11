@@ -24,17 +24,19 @@ if word:
                 definition_text = definition["text"]
                 examples = definition["examples"]
                 synonyms = definition["synonyms"]
+                antonyms = definition["antonyms"]
 
                 example_text = "<br>".join([f"<span style='color:blue; font-style:italic;'>- {ex}</span>" for ex in examples])
                 synonym_text = f"<br><strong>Synonyms: </strong>{' - '.join(synonyms)}" if synonyms else ""
+                antonym_text = f"<br><strong>Antonyms: </strong>{' - '.join(antonyms)}" if antonyms else ""
 
                 st.markdown(
-                    f"<span style='font-weight: bold; font-size: 16px;'>{num_def}</span> {definition_text}<br>{example_text}{synonym_text}",
+                    f"<span style='font-weight: bold; font-size: 16px;'>{num_def}</span> {definition_text}<br>{example_text}{synonym_text}{antonym_text}",
                     unsafe_allow_html=True
                 )
         else:
-            st.warning("No definitions found!")
+            st.warning("Aucune définition trouvée !")
     else:
-        st.error("Failed to fetch the page. Please try again.")
+        st.error("Échec de récupération de la page. Veuillez réessayer.")
 else:
-    st.warning("Please enter a valid word.")
+    st.warning("Veuillez entrer un mot valide.")

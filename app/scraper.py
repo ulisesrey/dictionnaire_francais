@@ -56,6 +56,7 @@ def get_clean_definition_text(definition):
         num_def.extract()  # Remove the number tag
 
     # The first text node after removing numDef is the real definition
+    # TODO: Improve this logic to handle more complex cases, see https://github.com/ulisesrey/dictionnaire_francais/issues/12
     definition_text = definition.get_text(" ", strip=True).split(":")[0]  # Stop at ":" to avoid examples
     
     return definition_text

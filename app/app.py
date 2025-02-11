@@ -1,88 +1,40 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
+from scraper import fetch_page_content, get_catgram, get_definitions
 
 st.title("Dictionaire Français")
 
-
-# get query params from URL
+# Get query params
 query_params = st.query_params
 word = query_params.get("mot", "")
-#word_from_url = query_params.get("word", [""])[0]
-print(word)
 
-# User input for URL
-word = st.text_input("Mot à chercher", value=word, placeholder="Ecrivez votre mot ici")
+# User input field
+word = st.text_input("Mot à chercher", value=word, placeholder="Écrivez votre mot ici")
 
-#if st.button("Search Definition"):
 if word:
-    try:
-        headers = {"User-Agent": "Mozilla/5.0"} # TODO: Add random headers to avoid getting blocked
-        url = "https://www.larousse.fr/dictionnaires/francais/"+word
-        page = requests.get(url, timeout=10)
-        soup = BeautifulSoup(page.content, 'html.parser')
-
-        # Get Catgram
-        catgram = soup.find("p", class_="CatgramDefinition")
-        if catgram:
-            # Remove <a> tags inside the CatgramDefinition
-            for a in catgram.find_all("a"):
-                a.extract()
-
-            catgram_text = catgram.get_text(strip=True)
-        else:
-            catgram_text = "Unknown"
-
-        # Extract all definitions
-        definitions = soup.select(".Definitions .DivisionDefinition")
+    soup = fetch_page_content(word)
+    if soup:
+        catgram_text = get_catgram(soup)
+        definitions = get_definitions(soup)
 
         if definitions:
             st.subheader(f"{word} ({catgram_text})")
 
-            formatted_definitions = []
-
             for definition in definitions:
-                # Extract the definition number and text
-                num_def = definition.find("span", class_="numDef").text.strip()
+                num_def = definition["number"]
+                definition_text = definition["text"]
+                examples = definition["examples"]
+                synonyms = definition["synonyms"]
 
-                # Extract all examples if available
-                examples = definition.find_all("span", class_="ExempleDefinition")
-                example_text = "<br>"
-                
-                if examples:
-                    #example_text = "<br><span style='color:blue; font-style:italic;'>Example(s):</span><br>"
-                    for i, example in enumerate(examples):
-                        i=i+1
-                        example_text += f"<span style='color:blue; font-style:italic;'>- {example.text.strip()}</span>  "
-                
-                # Now we can remove them from definition
-                for example in definition.find_all("span", class_="ExempleDefinition"):
-                    example.extract()
-                definition_text = definition.get_text(" ", strip=True).replace(num_def, '').strip()
-                # if there is a ":" at the end, remove it
-                if definition_text[-1] == ":":
-                    definition_text = definition_text[:-1]
-                
+                example_text = "<br>".join([f"<span style='color:blue; font-style:italic;'>- {ex}</span>" for ex in examples])
+                synonym_text = f"<br><strong>Synonyms: </strong>{' - '.join(synonyms)}" if synonyms else ""
 
-                # Extract synonyms if available
-                synonyms = definition.find_all("span", class_="Renvois")
-                synonym_text = ""
-                if synonyms:
-                    synonym_links = [synonym.find("a").text.strip() for synonym in synonyms]
-                    synonym_text = f"<br><strong>Synonyms: </strong>{' - '.join(synonym_links)}"
-
-                # Format the complete definition with the number, examples, and synonyms
-                formatted_definitions.append(
-                    f"<span style='font-weight: bold; font-size: 16px;'>{num_def}</span> {definition_text}{example_text}{synonym_text}"
+                st.markdown(
+                    f"<span style='font-weight: bold; font-size: 16px;'>{num_def}</span> {definition_text}<br>{example_text}{synonym_text}",
+                    unsafe_allow_html=True
                 )
-
-            # Join all formatted definitions with line breaks
-            st.markdown("<br><br>".join(formatted_definitions), unsafe_allow_html=True)
-
         else:
             st.warning("No definitions found!")
-
-    except Exception as e:
-        st.error(f"Error: {str(e)}")
+    else:
+        st.error("Failed to fetch the page. Please try again.")
 else:
     st.warning("Please enter a valid word.")

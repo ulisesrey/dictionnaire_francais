@@ -7,6 +7,13 @@ En tant qu'étudiant français, j'ai eu beaucoup de mal à consulter le site Int
 
 Comparez, l'avant et l'après:
 <img width="1316" alt="image" src="images/comparison.jpeg" />
+
+## Moteur de recherche personnalisé
+[Ici](https://support.google.com/chrome/answer/95426?hl=fr&co=GENIE.Platform%3DDesktop#zippy=%2Cchamp-url-avec-s-%C3%A0-la-place-de-la-requ%C3%AAte) les instructions pour l'utiliser comme moteur de recherche personnalisé avec chrome.
+
+URL: https://ledictionnaire.streamlit.app/?mot=%s
+
+
 ### Autor <a name= "autor"></a>
 Ulises Rey
 
@@ -19,8 +26,10 @@ As a french student I had a very hard time looking at the Larousse website for w
 Compare, before and after:
 <img width="1316" alt="image" src="images/comparison.jpeg" />
 
+## Custom Search with Le Dictionnaire
+Follow this instructions to use Le Dictionnaire as a custom search engine, for faster usage. [Chrome](https://zapier.com/blog/add-search-engine-to-chrome/) and [Firefox](https://superuser.com/questions/7327/how-to-add-a-custom-search-engine-to-firefox)
 
-
+URL: https://ledictionnaire.streamlit.app/?mot=%s
 ### Author <a name= "author"></a>
 Ulises Rey
 

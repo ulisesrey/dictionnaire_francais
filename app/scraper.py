@@ -65,7 +65,8 @@ def get_clean_definition_text(definition):
 
 def get_definitions(soup):
     """Extracts and formats definitions from the page."""
-    definitions = soup.select(".Definitions .DivisionDefinition")
+    # TODO: Working on this line
+    definitions = soup.find_all("div", class_=["Zone-Entree1 header-article", "Zone-Entree header-article"])
     formatted_definitions = []
 
     for definition in definitions:
